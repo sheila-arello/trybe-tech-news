@@ -1,19 +1,33 @@
+import requests
+import time
+from bs4 import BeautifulSoup
+# from parsel import Selector
+
+
 # Requisito 1
 def fetch(url):
     headers = {'user-agent': 'Fake user-agent'}
     try:
-        response = requests.get(url, headers=headers, timeout=wait)
+        time.sleep(1)
+        response = requests.get(url, headers=headers, timeout=1)
         response.raise_for_status()
     except (requests.HTTPError, requests.ReadTimeout):
         return None
     else:
-        soup = BeautifulSoup(response.text, "html.parser")
-        return soup
+        return response.text
 
 
 # Requisito 2
 def scrape_novidades(html_content):
-    """Seu código deve vir aqui"""
+    page = BeautifulSoup(html_content, "html.parser")
+    lista = []
+    data_links = page.find_all("article")
+    for link in data_links:
+        link.find("a").get("href")
+        if link.find("a").get("href") is not None:
+            lista.append(link.find("a").get("href"))
+    lista = lista[1:]
+    return lista
 
 
 # Requisito 3
