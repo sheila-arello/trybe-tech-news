@@ -41,25 +41,36 @@ def scrape_next_page_link(html_content):
     return next_page
 
 
+# web_links = soup.select('a')
+# actual_web_links = [web_link['href'] for web_link in web_links]
 # Requisito 4
 def scrape_noticia(html_content):
-    pass
-#     html_page = fetch(url)
-#     header_news = html_page.find("div", {"class": "entry-header-inner"})
-#     category = header_news.find("span", class_= "label").text
-#     title = header_news.find("h1", class_= "entry-title").text
+    page = BeautifulSoup(html_content, "html.parser")
+    url = page.find("link", {"rel": "canonical"})['href']
+    tags = page.find_all("a", {"rel": "tag"})
+    tag_list = sorted(list(set([tag.text for tag in tags])))
+    sumary = page.find("div", class_="entry-content").find("p").text
+    header_news = page.find("div", {"class": "entry-header-inner"})
+    category = header_news.find("span", class_="label").text
+    title = header_news.find("h1", class_="entry-title").text
+    writer = header_news.find("span", class_="author").text
+    timestamp = header_news.find("li", class_="meta-date").text
 
-#     writer = header_news.find("span", class_= "author").text
-#     # tags = quote.find("div", class_="tags").find_all("a")
-#     # tag_list = [tag.text for tag in tags]
-#     # single_quote = [text, author, tag_list]
-#     data_news = {
-#                 "url": url,
-#                 "title": title,
-#                 "writer": writer,
-#                 "category": category,
-#               }
-#     return data_news
+    # comments_count - número de comentários que a notícia recebeu.
+    # Se a informação não for encontrada, salve este atributo como 0 (zero)
+    # summary - o primeiro parágrafo da notícia. entry-content
+
+    data_news = {
+                "url": url,
+                "title": title.strip(),
+                "writer": writer,
+                "category": category,
+                "timestamp": timestamp,
+                "tags": tag_list,
+                "comments_count": 0,
+                "summary": sumary.strip(),
+              }
+    return data_news
 
 
 # Requisito 5
@@ -71,3 +82,6 @@ def get_tech_news(amount):
 #     url = "https://blog.betrybe.com/"
 #     html_content = fetch(url)
 #     print(scrape_next_page_link(html_content))
+#     print(scrape_noticia(fetch("https://blog.betrybe.com/ferramentas/r-studio/")))
+
+# <div class="post-comments post-comments-simple" id="comments">
