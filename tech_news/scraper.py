@@ -1,6 +1,14 @@
 # Requisito 1
 def fetch(url):
-    """Seu código deve vir aqui"""
+    headers = {'user-agent': 'Fake user-agent'}
+    try:
+        response = requests.get(url, headers=headers, timeout=wait)
+        response.raise_for_status()
+    except (requests.HTTPError, requests.ReadTimeout):
+        return None
+    else:
+        soup = BeautifulSoup(response.text, "html.parser")
+        return soup
 
 
 # Requisito 2
