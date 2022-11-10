@@ -1,7 +1,10 @@
 import requests
+import re
 import time
 from bs4 import BeautifulSoup
-# from parsel import Selector
+from tech_news.database import (
+    create_news,
+)
 
 
 # Requisito 1
@@ -21,12 +24,10 @@ def fetch(url):
 def scrape_novidades(html_content):
     page = BeautifulSoup(html_content, "html.parser")
     lista = []
-    data_links = page.find_all("article")
+    data_links = page.find_all("a", {"class": "cs-overlay-link"})
     for link in data_links:
-        link.find("a").get("href")
-        if link.find("a").get("href") is not None:
-            lista.append(link.find("a").get("href"))
-    lista = lista[1:]
+        if link.get("href") is not None:
+            lista.append(link.get("href"))
     return lista
 
 
@@ -41,8 +42,6 @@ def scrape_next_page_link(html_content):
     return next_page
 
 
-# web_links = soup.select('a')
-# actual_web_links = [web_link['href'] for web_link in web_links]
 # Requisito 4
 def scrape_noticia(html_content):
     page = BeautifulSoup(html_content, "html.parser")
@@ -55,11 +54,12 @@ def scrape_noticia(html_content):
     title = header_news.find("h1", class_="entry-title").text
     writer = header_news.find("span", class_="author").text
     timestamp = header_news.find("li", class_="meta-date").text
-
-    # comments_count - número de comentários que a notícia recebeu.
-    # Se a informação não for encontrada, salve este atributo como 0 (zero)
-    # summary - o primeiro parágrafo da notícia. entry-content
-
+    comments = page.find("div", {"id": "comments"})
+    if not comments:
+        comments_count = 0
+    else:
+        txt = comments.find("h5").text.strip()
+        comments_count = int(re.findall('[0-9]+', txt)[0])
     data_news = {
                 "url": url,
                 "title": title.strip(),
@@ -67,7 +67,7 @@ def scrape_noticia(html_content):
                 "category": category,
                 "timestamp": timestamp,
                 "tags": tag_list,
-                "comments_count": 0,
+                "comments_count": comments_count,
                 "summary": sumary.strip(),
               }
     return data_news
@@ -75,8 +75,16 @@ def scrape_noticia(html_content):
 
 # Requisito 5
 def get_tech_news(amount):
-    """Seu código deve vir aqui"""
-
+    url = "https://blog.betrybe.com/"
+    html_content = fetch(url)
+    links = scrape_novidades(html_content)
+    while amount > len(links):
+        next_page = scrape_next_page_link(html_content)
+        html_content = fetch(next_page)
+        links += scrape_novidades(html_content)
+    noticias = [scrape_noticia(fetch(link)) for link in links[:amount]]
+    create_news(noticias)
+    return noticias
 
 # if __name__ == "__main__":
 #     url = "https://blog.betrybe.com/"
