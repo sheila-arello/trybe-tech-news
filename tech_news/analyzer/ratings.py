@@ -23,4 +23,4 @@ def top_5_categories():
     # ordem alfabetica de categoria, a seguir cria lista apenas com nomes
     top_5_tuples = sorted(list_categories, key=lambda x: (-x[0], x[1]))
     top_5 = [x[1] for x in top_5_tuples]
-    return top_5
+    return top_5[:5]
