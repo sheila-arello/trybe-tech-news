@@ -1,12 +1,18 @@
 import sys
-from tech_news.analyzer.ratings import top_5_news, top_5_categories
+
+from tech_news.analyzer.ratings import top_5_categories, top_5_news
+from tech_news.analyzer.search_engine import (search_by_category,
+                                              search_by_date, search_by_tag,
+                                              search_by_title)
 from tech_news.scraper import get_tech_news
-from tech_news.analyzer.search_engine import (
-    search_by_title,
-    search_by_date,
-    search_by_tag,
-    search_by_category,
-)
+
+
+switcher = {
+    0: "Digite quantas notícias serão buscadas:",
+    1: "Digite o título:",
+    2: "Digite a data no formato aaaa-mm-dd:",
+    3: "Digite a tag:",
+    4: "Digite a categoria:"}
 
 
 # Requisito 12
@@ -21,39 +27,36 @@ def analyzer_menu():
     option = input('Opção escolhida: ')
     if option.isnumeric():
         if int(option) < 8:
-            value = switch_options(int(option))
-            print(value)
+            value = menu_options(int(option))
             return value
     print("Opção inválida", file=sys.stderr)
 
 
-def switch_options(argument):
-    switcher = {
-        0: "Digite quantas notícias serão buscadas:",
-        1: "Digite o título:",
-        2: "Digite a data no formato aaaa-mm-dd:",
-        3: "Digite a tag:",
-        4: "Digite a categoria:",
-    }
+def menu_options(argument):
     value = None
     if argument == 7:
         value = "Encerrando script"
         print(value)
         SystemExit()
-    if argument == 6:
+    elif argument == 6:
         value = top_5_categories()
-    if argument == 5:
+    elif argument == 5:
         value = top_5_news()
-    if argument >= 0 and argument < 5:
-        value = input(switcher.get(argument))
-        if argument == 0:
-            value = get_tech_news(int(value))
-        if argument == 1:
-            value = search_by_title(value)
-        if argument == 2:
-            value = search_by_date(value)
-        if argument == 3:
-            value = search_by_tag(value)
-        if argument == 4:
-            value = search_by_category(value)
+    else:
+        value = switch_options(argument)
+    return value
+
+
+def switch_options(argument):
+    value = input(switcher.get(argument))
+    if argument == 0:
+        value = get_tech_news(int(value))
+    elif argument == 1:
+        value = search_by_title(value)
+    elif argument == 2:
+        value = search_by_date(value)
+    elif argument == 3:
+        value = search_by_tag(value)
+    else:
+        value = search_by_category(value)
     return value

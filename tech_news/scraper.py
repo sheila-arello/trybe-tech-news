@@ -85,11 +85,3 @@ def get_tech_news(amount):
     noticias = [scrape_noticia(fetch(link)) for link in links[:amount]]
     create_news(noticias)
     return noticias
-
-# if __name__ == "__main__":
-#     url = "https://blog.betrybe.com/"
-#     html_content = fetch(url)
-#     print(scrape_next_page_link(html_content))
-#     print(scrape_noticia(fetch("https://blog.betrybe.com/ferramentas/r-studio/")))
-
-# <div class="post-comments post-comments-simple" id="comments">
